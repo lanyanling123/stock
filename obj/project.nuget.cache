@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "dgSpecHash": "qILzmE0mJjI=",
+  "success": true,
+  "projectFilePath": "D:\\Blazor\\StockInfo\\StockInfo.csproj",
+  "expectedPackageFiles": [
+    "D:\\nuget\\packages\\antdesign\\1.4.3\\antdesign.1.4.3.nupkg.sha512",
+    "D:\\nuget\\packages\\antdesign.datagrid\\11.0.0\\antdesign.datagrid.11.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\antdesign.icons\\0.1.1\\antdesign.icons.0.1.1.nupkg.sha512",
+    "D:\\nuget\\packages\\antdesign.prolayout\\1.4.0\\antdesign.prolayout.1.4.0.nupkg.sha512",
+    "D:\\nuget\\packages\\avalonia\\11.0.0\\avalonia.11.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\avalonia.buildservices\\0.0.28\\avalonia.buildservices.0.0.28.nupkg.sha512",
+    "D:\\nuget\\packages\\avalonia.controls.datagrid\\11.0.0\\avalonia.controls.datagrid.11.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\avalonia.remote.protocol\\11.0.0\\avalonia.remote.protocol.11.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microcom.runtime\\0.11.0\\microcom.runtime.0.11.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.aspnetcore.authorization\\7.0.0\\microsoft.aspnetcore.authorization.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.aspnetcore.components\\7.0.0\\microsoft.aspnetcore.components.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.aspnetcore.components.analyzers\\7.0.0\\microsoft.aspnetcore.components.analyzers.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.aspnetcore.components.forms\\7.0.0\\microsoft.aspnetcore.components.forms.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.aspnetcore.components.web\\7.0.0\\microsoft.aspnetcore.components.web.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.aspnetcore.metadata\\7.0.0\\microsoft.aspnetcore.metadata.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.extensions.dependencyinjection\\7.0.0\\microsoft.extensions.dependencyinjection.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\7.0.0\\microsoft.extensions.dependencyinjection.abstractions.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.extensions.logging.abstractions\\7.0.0\\microsoft.extensions.logging.abstractions.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.extensions.options\\7.0.0\\microsoft.extensions.options.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.extensions.primitives\\7.0.0\\microsoft.extensions.primitives.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\microsoft.jsinterop\\7.0.0\\microsoft.jsinterop.7.0.0.nupkg.sha512",
+    "D:\\nuget\\packages\\oneof\\3.0.271\\oneof.3.0.271.nupkg.sha512",
+    "D:\\nuget\\packages\\system.componentmodel.annotations\\4.5.0\\system.componentmodel.annotations.4.5.0.nupkg.sha512",
+    "D:\\nuget\\packages\\system.io.pipelines\\7.0.0\\system.io.pipelines.7.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

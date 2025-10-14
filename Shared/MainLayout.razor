@@ -1,0 +1,56 @@
+﻿@inherits LayoutComponentBase
+@using AntDesign
+@inject NavigationManager NavigationManager
+
+<Layout>
+    <!-- 顶部导航栏 -->
+    <Header Style="background: #001529; padding: 0 24px;height: 48px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;height: 48px;">
+            <!-- 左侧Logo和标题 -->
+            <div style="display: flex; align-items: center; color: white; font-size: 18px;">
+                <span>StockInfo</span>
+            </div>
+            
+            <!-- 顶部水平导航菜单 -->
+            <Menu Theme="MenuTheme.Dark" 
+                  Mode="MenuMode.Horizontal" 
+                  Style="background: transparent; border-bottom: none; line-height: 48px; height: 48px; flex: 1; justify-content: center;"
+                  SelectedKeys="@_selectedKeys"
+                  InlineIndent="0">
+                <MenuItem Key="1" OnClick="@(() => NavigateToSubPage(""))">首页</MenuItem>
+                <MenuItem Key="2" OnClick="@(() => NavigateToSubPage("fetchdata"))">实时行情</MenuItem>
+                <MenuItem Key="3" OnClick="@(() => NavigateToSubPage("counter"))">历史数据</MenuItem>
+                <MenuItem Key="4" OnClick="@(() => NavigateToSubPage("subpage"))">财务报表</MenuItem>
+                <MenuItem Key="5" OnClick="@(() => NavigateToSubPage("subpage"))">指标分析</MenuItem>
+                <MenuItem Key="6" OnClick="@(() => NavigateToSubPage("subpage"))">关于</MenuItem>
+            </Menu>
+
+            <!-- 右侧用户区或其他链接 -->
+            <div style="color: white;">
+                <a href="https://docs.microsoft.com/aspnet/" target="_blank" style="color: rgba(255,255,255,0.65);">About</a>
+            </div>
+        </div>
+    </Header>
+
+    <!-- 主内容区域 -->
+    <Content Style="padding: 24px; background: #f0f2f5; min-height: calc(100vh - 48px);">
+        <div style="background: #fff; padding: 24px; border-radius: 6px;">
+            @Body
+        </div>
+    </Content>
+
+    <!-- 页脚 (可选) -->
+    <Footer Style="text-align: center; background: #f0f2f5;">
+        © @DateTime.Now.Year StockInfo - Powered by Blazor
+    </Footer>
+</Layout>
+            @code {
+                // 在代码块中定义 selectedKeys 数组
+                private string[] _selectedKeys = new[] { "1" };
+
+                // 跳转到子页面的方法
+                private void NavigateToSubPage(string page)
+                {
+                     NavigationManager.NavigateTo(page);
+                }
+            }

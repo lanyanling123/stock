@@ -1,4 +1,4 @@
-namespace StockInfo.Data
+namespace StockAPI
 {
     public class WeatherForecast
     {

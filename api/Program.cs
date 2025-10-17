@@ -1,4 +1,7 @@
 
+using Npgsql;
+using StockAPI.Service;
+
 namespace StockAPI
 {
     public class Program
@@ -12,6 +15,13 @@ namespace StockAPI
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddScoped<NpgsqlConnection>(provider =>
+            {
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                return new NpgsqlConnection(connectionString);
+            });
+            builder.Services.AddScoped<StockListService>();
 
             var app = builder.Build();
 

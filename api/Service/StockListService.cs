@@ -29,6 +29,39 @@ namespace StockAPI.Service
             return name ?? "Unknown";
         }
         /// <summary>
+        /// 删除自选
+        /// </summary>
+        /// <param name="subjectid"></param>
+        /// <param name="date1"></param>
+        /// <param name="date2"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteSelfStock(int subjectid, int t_date, string code)
+        {
+            var connStr = _configuration.GetConnectionString("DefaultConnection");
+            using var connection = new NpgsqlConnection(connStr);
+            var parameters = new DynamicParameters();
+            parameters.Add("subjectid", subjectid);
+            parameters.Add("t_date", t_date);
+            parameters.Add("code", code);
+            // 删除
+            var sql = @"Delete from fupan_ticai_select where t_date=@t_date and subject_id = @subjectid and code = @code";
+            var result = await connection.ExecuteAsync(sql, parameters);
+            return result > 0;
+        }
+        /// <summary>
+        /// 自选股最新日期
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> MaxSelfDate()
+        {
+            var connStr = _configuration.GetConnectionString("DefaultConnection");
+            using var connection = new NpgsqlConnection(connStr);
+            // 删除
+            var sql = @"Select max(t_date) as maxdate from fupan_ticai_select";
+            var result = await connection.ExecuteScalarAsync<int>(sql);
+            return result;
+        }
+        /// <summary>
         /// 导入主题题材自选股
         /// </summary>
         /// <param name="subjectid"></param>

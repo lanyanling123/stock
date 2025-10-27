@@ -23,84 +23,85 @@ namespace StockAPI.Service.Jobs
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("PeriodicJobService 启动，间隔：{Interval}", _interval);
+            //_logger.LogInformation("PeriodicJobService 启动，间隔：{Interval}", _interval);
 
-            // 第一次延迟为0，立即执行，或可改为根据配置计算首次触发时间
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                try
-                {
-                    // 检查是否为工作日且时间在15:30之后
-                    var now = DateTime.Now;
-                    var isWeekday = now.DayOfWeek >= DayOfWeek.Monday && now.DayOfWeek <= DayOfWeek.Friday;
-                    var targetTime = new TimeSpan(15, 30, 0);
+            //// 第一次延迟为0，立即执行，或可改为根据配置计算首次触发时间
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    try
+            //    {
+            //        // 检查是否为工作日且时间在15:30之后
+            //        var now = DateTime.Now;
+            //        var isWeekday = now.DayOfWeek >= DayOfWeek.Monday && now.DayOfWeek <= DayOfWeek.Friday;
+            //        var targetTime = new TimeSpan(15, 30, 0);
 
-                    if (!isWeekday || now.TimeOfDay < targetTime)
-                    {
-                        // 如果不是工作日或时间未到15:30，计算到下一个工作日15:30的延迟时间
-                        var nextExecutionTime = CalculateNextExecutionTime(now);
-                        var delay = nextExecutionTime - now;
-                        _logger.LogInformation("当前时间不符合执行条件，等待到 {NextExecutionTime} 执行", nextExecutionTime);
-                        await Task.Delay(delay, stoppingToken);
-                        continue;
-                    }
+            //        if (!isWeekday || now.TimeOfDay < targetTime)
+            //        {
+            //            // 如果不是工作日或时间未到15:30，计算到下一个工作日15:30的延迟时间
+            //            var nextExecutionTime = CalculateNextExecutionTime(now);
+            //            var delay = nextExecutionTime - now;
+            //            _logger.LogInformation("当前时间不符合执行条件，等待到 {NextExecutionTime} 执行", nextExecutionTime);
+            //            await Task.Delay(delay, stoppingToken);
+            //            continue;
+            //        }
 
-                    // 添加随机分钟数（1-30分钟）
-                    var random = new Random();
-                    var randomMinutes = random.Next(1, 31);
-                    _logger.LogInformation("添加随机延迟 {RandomMinutes} 分钟", randomMinutes);
-                    await Task.Delay(TimeSpan.FromMinutes(randomMinutes), stoppingToken);
+            //        // 添加随机分钟数（1-30分钟）
+            //        var random = new Random();
+            //        var randomMinutes = random.Next(1, 31);
+            //        _logger.LogInformation("添加随机延迟 {RandomMinutes} 分钟", randomMinutes);
+            //        await Task.Delay(TimeSpan.FromMinutes(randomMinutes), stoppingToken);
 
-                    using var scope = _provider.CreateScope();
-                    // 从 DI 容器解析你需要的服务
-                    var jiuyangService = scope.ServiceProvider.GetRequiredService<JiuyangongsheService>();
-                    var tradeDateService = scope.ServiceProvider.GetRequiredService<TradeDateService>();
+            //        using var scope = _provider.CreateScope();
+            //        // 从 DI 容器解析你需要的服务
+            //        var jiuyangService = scope.ServiceProvider.GetRequiredService<JiuyangongsheService>();
+            //        var tradeDateService = scope.ServiceProvider.GetRequiredService<TradeDateService>();
 
-                    // 检查是否为交易日
-                    if (tradeDateService.IsTradeDate(int.Parse(DateTime.Now.ToString("yyyyMMdd"))).Result == false)
-                    {
-                        _logger.LogInformation("今日非交易日，跳过数据抓取");
-                        continue;
-                    }
+            //        // 检查是否为交易日
+            //        if (tradeDateService.IsTradeDate(int.Parse(DateTime.Now.ToString("yyyyMMdd"))).Result == false)
+            //        {
+            //            _logger.LogInformation("今日非交易日，跳过数据抓取");
+            //            continue;
+            //        }
 
-                    // 示例：按你现有逻辑批量抓取并保存数据
-                    var lastDate = int.Parse(DateTime.Today.ToString("yyyyMMdd"));
-                    var dateList = await tradeDateService.GetTradeDates(150, 20250627);
+            //        // 示例：按你现有逻辑批量抓取并保存数据
+            //        var lastDate = int.Parse(DateTime.Today.ToString("yyyyMMdd"));
+            //        var dateList = await tradeDateService.GetTradeDates(150, 20250627);
 
-                    foreach (var dt in dateList)
-                    {
-                        if (stoppingToken.IsCancellationRequested) break;
+            //        foreach (var dt in dateList)
+            //        {
+                        
+            //            if (stoppingToken.IsCancellationRequested) break;
 
-                        // 产生随机休眠避免被目标频率限制
-                        var waitSeconds = random.Next(30, 60);
-                        await Task.Delay(TimeSpan.FromSeconds(waitSeconds), stoppingToken);
-                        var tdate = DateTime.ParseExact(dt.T_date.ToString(), "yyyyMMdd", null);
-                        string result = tdate.ToString("yyyy-MM-dd");
-                        _logger.LogInformation("开始获取日期 {Date} 数据", result);
+            //            // 产生随机休眠避免被目标频率限制
+            //            var waitSeconds = random.Next(30, 60);
+            //            await Task.Delay(TimeSpan.FromSeconds(waitSeconds), stoppingToken);
+            //            var tdate = DateTime.ParseExact(dt.T_date.ToString(), "yyyyMMdd", null);
+            //            string result = tdate.ToString("yyyy-MM-dd");
+            //            _logger.LogInformation("开始获取日期 {Date} 数据", result);
 
-                        var data = await jiuyangService.GetActionFieldDataAsync(result);
-                        jiuyangService.SaveDataToDB(data);
-                    }
-                }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-                    // 取消，直接退出
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "PeriodicJobService 执行任务时发生异常");
-                }
+            //            var data = await jiuyangService.GetActionFieldDataAsync(result);
+            //            jiuyangService.SaveDataToDB(data);
+            //        }
+            //    }
+            //    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            //    {
+            //        // 取消，直接退出
+            //        break;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        _logger.LogError(ex, "PeriodicJobService 执行任务时发生异常");
+            //    }
 
-                try
-                {
-                    await Task.Delay(_interval, stoppingToken);
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-            }
+            //    try
+            //    {
+            //        await Task.Delay(_interval, stoppingToken);
+            //    }
+            //    catch (OperationCanceledException)
+            //    {
+            //        break;
+            //    }
+            //}
 
             _logger.LogInformation("PeriodicJobService 停止");
         }

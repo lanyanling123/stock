@@ -168,3 +168,40 @@ export async function importSelfStock(
     ...(options || {}),
   });
 }
+// 删除自选股
+export async function deleteSelfStock(
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/Common/del/self`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+// 获取自选股最新日期
+export async function getSelfStockNewDate(
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/Common/self/latestdate`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+// 获取是否交易时间
+export async function getIsTradeTime(
+) {
+  return request<any>(`/api/Common/istradetime`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}

@@ -38,7 +38,10 @@ namespace StockAPI.Controllers
         {
             string dateStr = date ?? DateTime.Now.ToString("yyyy-MM-dd");
             var data = await _jiuyangongsheService.GetActionFieldDataAsync(dateStr);
-            _jiuyangongsheService.SaveDataToDB(data);
+            if (data != null)
+            {
+                _jiuyangongsheService.SaveDataToDB(data);
+            }
             return data;
         }
         // GET api/<JygsController>/5

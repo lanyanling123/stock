@@ -1,3 +1,17 @@
+//股票代码转换
+export const stockCode2 = (code: string): string => {
+  if (code.length === 8) {
+    return code;
+  }
+  if (code.length === 6) {
+    if(code.substring(0, 1) === '6') {
+      return 'sh' + code;
+    } else {
+      return 'sz' + code;
+    }
+  }
+  return code;
+};
 /**
  * 将各种日期格式转换为YYYYMMDD格式的字符串
  * @param date 日期对象、字符串或其他日期格式

@@ -3,40 +3,39 @@
   font-style: normal;
   font-weight: 300;
   font-display: swap;
-  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*1GSgSYDD_aIAAAAAQsAAAAgAegCCAQ/AlibabaSans-Light.woff2")
-    format("woff2");
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*1GSgSYDD_aIAAAAAQsAAAAgAegCCAQ/AlibabaSans-Light.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "AlibabaSans";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*2zEUQqnPNesAAAAAQtAAAAgAegCCAQ/AlibabaSans-Regular.woff2")
-    format("woff2");
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*2zEUQqnPNesAAAAAQtAAAAgAegCCAQ/AlibabaSans-Regular.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "AlibabaSans";
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Medium.woff2")
-    format("woff2");
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Medium.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "AlibabaSans";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Bold.woff2")
-    format("woff2");
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Bold.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "AlibabaSans";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Heavy.woff2")
-    format("woff2");
+  src: url("//mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*E_cxRbMlZqUAAAAAQuAAAAgAegCCAQ/AlibabaSans-Heavy.woff2") format("woff2");
 }
 
 html,
@@ -57,6 +56,7 @@ body,
 .ant-layout {
   min-height: 100vh;
 }
+
 .ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
   left: unset;
 }
@@ -80,25 +80,56 @@ ol {
   .ant-table {
     width: 100%;
     overflow-x: auto;
-    &-thead > tr,
-    &-tbody > tr {
-      > th,
-      > td {
+
+    &-thead>tr,
+    &-tbody>tr {
+
+      >th,
+      >td {
         white-space: pre;
-        > span {
+
+        >span {
           display: block;
         }
       }
     }
   }
 }
+
 .ant-pro-layout .ant-pro-layout-content {
   padding-block: 3px !important;
   padding-inline: 3px !important;
 }
-.ant-pro-table-list-toolbar-container{
+
+.ant-pro-table-list-toolbar-container {
   padding-block: 8px !important;
 }
-.ant-pro-card .ant-pro-card-body{
+
+.ant-pro-card .ant-pro-card-body {
   padding-inline: 8px !important;
+}
+
+/* 在组件文件顶部或全局CSS文件中添加 */
+.table-column-bg-even {
+  background-color: #f5f5f5;
+}
+
+.table-column-bg-odd {
+  background-color: #ffffff;
+}
+
+/* 减少表格单元格的上下左右padding */
+.ant-table-cell {
+  padding: 4px 8px !important;
+}
+
+/* 减少表头单元格的padding */
+.ant-table-thead>tr>th {
+  padding: 6px 8px !important;
+}
+
+/* 减少表格内容区域的行高 */
+.ant-table-tbody>tr>td {
+  padding: 4px 8px !important;
+  line-height: 1.2 !important;
 }

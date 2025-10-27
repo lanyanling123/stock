@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using StockAPI.Data;
 using StockAPI.Service;
 using System.Runtime.CompilerServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -67,6 +68,73 @@ namespace StockAPI.Controllers
             try
             {
                 var data = await _stockListService.UpdateDataByTableName(tableid, HttpContext.Request.Query);
+                return Ok(new RequestResult()
+                {
+                    success = true,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new RequestResult()
+                {
+                    success = false,
+                    errorMessage = ex.Message
+                });
+            }
+        }
+        [HttpGet("del/self")]
+        public async Task<IActionResult> DeleteSelf(int subjectid, int t_date,string code)
+        {
+            try
+            {
+                var data = await _stockListService.DeleteSelfStock(subjectid, t_date, code);
+                return Ok(new RequestResult()
+                {
+                    success = true,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new RequestResult()
+                {
+                    success = false,
+                    errorMessage = ex.Message
+                });
+            }
+        }
+        [HttpGet("self/latestdate")]
+        public async Task<IActionResult> SelfStockLatestDate()
+        {
+            try
+            {
+                var data = await _stockListService.MaxSelfDate();
+                return Ok(new RequestResult()
+                {
+                    success = true,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new RequestResult()
+                {
+                    success = false,
+                    errorMessage = ex.Message
+                });
+            }
+        }
+        /// <summary>
+        /// 判断当前时间是否交易时间
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("istradetime")]
+        public async Task<IActionResult> IsTradeTime()
+        {
+            try
+            {
+                var data = await _tradeDateService.IsTradeTime();
                 return Ok(new RequestResult()
                 {
                     success = true,

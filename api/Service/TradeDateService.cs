@@ -51,5 +51,41 @@ namespace StockAPI.Service
                 new { date = date });
             return result.HasValue;
         }
+        /// <summary>
+        /// 判断当前时间是否交易时间
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsTradeTime()
+        {
+            var date = int.Parse(DateTime.Now.ToString("yyyyMMdd"));
+            // 判断今天是否交易日
+            bool isTradeDay = await IsTradeDate(date);
+            if (!isTradeDay)
+            {
+                return false;
+            }
+            // 判断A股市场是否是交易时间 
+            DateTime now = DateTime.Now;
+            return IsTradingTimePeriod(now);
+        }
+        /// <summary>
+        /// 判断时间是否在交易时段内
+        /// </summary>
+        private bool IsTradingTimePeriod(DateTime time)
+        {
+            TimeSpan currentTime = time.TimeOfDay;
+
+            // 上午交易时段：9:15-11:30
+            TimeSpan amStart = new TimeSpan(9, 15, 0);
+            TimeSpan amEnd = new TimeSpan(11, 30, 0);
+
+            // 下午交易时段：13:00-15:00
+            TimeSpan pmStart = new TimeSpan(13, 0, 0);
+            TimeSpan pmEnd = new TimeSpan(15, 0, 0);
+
+            // 检查是否在上午或下午交易时段内 [5](@ref)
+            return (currentTime >= amStart && currentTime <= amEnd) ||
+                   (currentTime >= pmStart && currentTime <= pmEnd);
+        }
     }
 }

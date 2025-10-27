@@ -82,11 +82,11 @@ public class JiuyangongsheService
             // 添加时间戳和token（这些可能是动态生成的）
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             request.Headers.Add("timestamp", timestamp.ToString());
-            //request.Headers.Add("token", "f120fd90f6e1b40dbaa3006ebd2ed5a8");
-            request.Headers.Add("token", jygsToken.token);
+            request.Headers.Add("token", "346e8a12951d9974eac601c2467d11e6");
+            //request.Headers.Add("token", jygsToken.token);
             // 添加Cookie
-            //request.Headers.Add("Cookie", "SESSION=ZDBlY2JkMjMtN2Y3MS00NjFkLWExZWUtYmEzNDc4NjExNjlm; Hm_lvt_58aa18061df7855800f2a1b32d6da7f4=1758760787,1760014888,1760964085; Hm_lpvt_58aa18061df7855800f2a1b32d6da7f4=1761313154");
-            request.Headers.Add("Cookie", jygsToken.cookie);
+            request.Headers.Add("Cookie", "SESSION=MGQwOTBiOTctYzRkNC00ZTdjLWFjNmItN2EzZTJjYTVlNDJm; Hm_lvt_58aa18061df7855800f2a1b32d6da7f4=1761311393,1761570206; Hm_lpvt_58aa18061df7855800f2a1b32d6da7f4=1761570245");
+            //request.Headers.Add("Cookie", jygsToken.cookie);
             Console.WriteLine($"发送请求到: {BaseUrl}{ApiPath}");
             // 发送请求
             var response = await _httpClient.SendAsync(request);

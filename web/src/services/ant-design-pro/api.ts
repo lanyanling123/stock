@@ -199,9 +199,5 @@ export async function getIsTradeTime(
 ) {
   return request<any>(`/api/Common/istradetime`, {
     method: 'GET',
-    params: {
-      ...params,
-    },
-    ...(options || {}),
   });
 }

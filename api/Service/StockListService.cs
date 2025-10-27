@@ -135,7 +135,7 @@ namespace StockAPI.Service
                 }
                 else
                 {
-                    var convertedValue = ConvertToDbType(value, columns[key]);
+                    var convertedValue = string.IsNullOrEmpty(value) ? "":  ConvertToDbType(value, columns[key]);
                     if (pkFields.Contains(key))
                     {
                         // 转换数据类型

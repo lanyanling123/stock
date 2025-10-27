@@ -5,11 +5,13 @@ import { DragSortTable, EditableProTable, LightFilter, ProFormDatePicker, ProFor
 import { Button, DatePicker, Flex, Form, Input, message, Modal, Popconfirm, Radio, RadioChangeEvent, Select, Space, Splitter, Table, TableColumnsType, Tag, Typography } from 'antd';
 import React, { useState, useCallback, Children } from 'react';
 import { useEffect, useRef } from 'react';
-import { getCommonData, getLatestDate, updateCommonData, 
-	getTradeDate, importSelfStock, deleteSelfStock,getSelfStockNewDate,
-	getIsTradeTime } from '@/services/ant-design-pro/api';
+import {
+	getCommonData, getLatestDate, updateCommonData,
+	getTradeDate, importSelfStock, deleteSelfStock, getSelfStockNewDate,
+	getIsTradeTime
+} from '@/services/ant-design-pro/api';
 import { SelectCommonPlacement } from 'antd/es/_util/motion';
-import { formatDateToYYYYMMDD, formatYYYYMMDDToStr, formatYYYYMMDDToDate, transformStockData,stockCode2 } from '@/services/utils/dateUtils';
+import { formatDateToYYYYMMDD, formatYYYYMMDDToStr, formatYYYYMMDDToDate, transformStockData, stockCode2 } from '@/services/utils/dateUtils';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
@@ -47,6 +49,9 @@ const ZiXuan: React.FC = () => {
 	// 3. 添加查询参数状态
 	const searchParmasRef = useRef<any>(null);
 
+	const [realtimeStockData, setRealtimeStockData] = useState<Record<string, any>>({});
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
+
 	// 在组件顶部定义状态
 	const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
 		dayjs().subtract(5, 'day'),
@@ -63,12 +68,6 @@ const ZiXuan: React.FC = () => {
 				// 获取自选股最新日期
 				const selfStockNewDate = await getSelfStockNewDate({});
 				selfStockNewDateRef.current = selfStockNewDate.data;
-				// 获取是否交易时间
-				const isTradeTime = await getIsTradeTime({});
-				if (isTradeTime.data) {
-					// 是交易时间，设置为最新日期
-					latestDateRef.current = selfStockNewDateRef.current;
-				}
 
 				if (tradeDateRef.current && tradeDateRef.current.length > 0) {
 					setDateRange([
@@ -84,6 +83,101 @@ const ZiXuan: React.FC = () => {
 		initColumns();
 		checkFileExists();
 	}, []);
+	useEffect(() => {
+		// 清除之前的定时器
+		if (timerRef.current) {
+			clearInterval(timerRef.current);
+		}
+
+		// 当selectedSubjectIdRef.current == 100时启动定时器
+		if (selectedSubjectIdRef.current === 100) {
+			// 立即执行一次
+			fetchRealtimeStockData();
+			// 设置定时器，每5秒执行一次
+			timerRef.current = setInterval(fetchRealtimeStockData, 1000 * 5);
+		}
+
+		// 组件卸载时清除定时器
+		return () => {
+			if (timerRef.current) {
+				clearInterval(timerRef.current);
+				timerRef.current = null;
+			}
+		};
+	}, [selectedSubjectIdRef.current]);
+	// 获取股票实时价格
+	const fetchRealtimeStockData = async () => {
+		console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'));
+		// const isTradetime = await getIsTradeTime();
+		// if (!isTradetime.data) {
+		// 	return;
+		// }
+		try {
+			if (selectedSubjectIdRef.current !== 100 || stockData.length === 0) {
+				return;
+			}
+
+			// 提取股票代码并转换格式
+			const codes = stockData
+				.map((item: any) => item.code)
+				.filter((code: any) => code && code.length > 0)
+				.map((code: string) => stockCode2(code));
+
+			if (codes.length === 0) {
+				return;
+			}
+
+			// 构建API请求URL
+			const codeParams = codes.map(code => `s_${code}`).join(',');
+			const apiUrl = `http://qt.gtimg.cn/q=${codeParams}`;
+
+			// 调用API获取实时数据
+			const response = await fetch(apiUrl);
+			const data = await response.text();
+
+			// 解析返回的结果
+			const parsedData: Record<string, any> = {};
+			const lines = data.split(';');
+
+			lines.forEach(line => {
+				if (!line || !line.includes('=')) return;
+
+				try {
+					// 提取股票代码和数据部分
+					const match = line.match(/v_s_([a-z\d]+)="([^"]+)"/i);
+					if (!match) return;
+
+					const stockCode = match[1].substring(2, 8);
+					const stockInfo = match[2].split('~');
+
+					// 解析数据
+					parsedData[stockCode] = {
+						code: stockInfo[2],
+						currentPrice: parseFloat(stockInfo[3]),
+						priceChange: parseFloat(stockInfo[4]),
+						priceChangePercent: parseFloat(stockInfo[5]) ,
+						volume: parseInt(stockInfo[6]),
+						amount: (parseFloat(stockInfo[7])/10000.0).toFixed(2),
+					};
+				} catch (error) {
+					console.error('解析股票数据失败:', error);
+				}
+			});
+
+			setRealtimeStockData(parsedData);
+			console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'), parsedData);
+			// 更新股票数据
+			const priceData = stockData.map((item: any) => ({
+				...item,
+				...parsedData[item.code],
+			}));
+			console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'), priceData);
+			setStockData(priceData);
+		} catch (error) {
+			console.error('获取实时股票数据失败:', error);
+		}
+	};
+
 	// 检查是否交易时间
 	const isTradeTime = async () => {
 		const isTradeTime = await getIsTradeTime();
@@ -100,19 +194,47 @@ const ZiXuan: React.FC = () => {
 				fixed: 'left',
 			},
 			{
-				title: '股票代码',
+				title: '代码',
 				dataIndex: 'code',
 				width: 100,
 				render: (_) => <a>{_}</a>,
 			},
 			{
-				title: '股票名称',
+				title: '名称',
 				dataIndex: 'name',
+			},
+			{
+				title: '价格',
+				dataIndex: 'currentPrice',
+				align: 'right',
+				render: (_, record) => {
+					const color = record.priceChange >= 0 ? 'red' : 'green';
+					return <span style={{ color }}>{record.currentPrice}</span>;
+				},
+			},
+			{
+				title: '涨跌幅',
+				dataIndex: 'priceChangePercent',
+				align: 'right',
+				render: (_, record) => {
+					// 根据priceChange设置涨跌幅的颜色
+					const color = record.priceChange >= 0 ? 'red' : 'green';
+					return <span style={{ color }}>{record.priceChangePercent}%</span>;
+				},
+			},
+			{
+				title: '成交额',
+				dataIndex: 'amount',
+				align: 'right',
+				render: (_, record) => {
+					// 根据priceChange设置涨跌幅的颜色
+					return <span>{record.amount}亿</span>;
+				},
 			},
 			{
 				title: '辨识度',
 				dataIndex: 'tags',
-			}, 
+			},
 			{
 				title: '自选日期',
 				dataIndex: 't_date',
@@ -206,6 +328,7 @@ const ZiXuan: React.FC = () => {
 				params.flag = 1;
 			} else {
 				params.flag = 0;
+				params.tags = '';
 			}
 			// 调用 API 更新数据
 			const response = await updateCommonData(105, params);
@@ -359,6 +482,9 @@ const ZiXuan: React.FC = () => {
 				if (selectedSubjectIdRef.current == 100) {
 					initColumns();
 					setStockData(response.data);
+					// 确保数据更新后获取实时数据
+					fetchRealtimeStockData();
+					setTimeout(fetchRealtimeStockData, 1000 * 5);
 					return;
 				}
 				// 从新定义列
@@ -645,8 +771,12 @@ const ZiXuan: React.FC = () => {
 							placeholder="请输入辨识度"
 							options={[
 								{
-									value: '反包',
-									label: '反包',
+									value: '反包首板',
+									label: '反包首板',
+								},
+								{
+									value: '反包多板',
+									label: '反包多板',
 								},
 								{
 									value: '容量',
@@ -671,6 +801,10 @@ const ZiXuan: React.FC = () => {
 								{
 									value: '超预期',
 									label: '超预期',
+								},
+								{
+									value: '',
+									label: '空',
 								},
 							]}
 						/>

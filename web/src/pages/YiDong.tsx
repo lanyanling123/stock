@@ -5,7 +5,8 @@ import { Button, Tag } from 'antd';
 import React, { useState, useCallback } from 'react';
 import { useEffect, useRef } from 'react';
 import { getCommonData, getLatestDate } from '@/services/ant-design-pro/api';
-import { formatDateToYYYYMMDD } from '@/services/utils/dateUtils';
+import { formatDateToYYYYMMDD, formatYYYYMMDDToStr } from '@/services/utils/dateUtils';
+import dayjs from 'dayjs';
 const columns: ProColumns<any>[] = [
   {
     title: '日期',
@@ -38,12 +39,17 @@ const YiDong: React.FC = () => {
   const [expandedRowData, setExpandedRowData] = useState<Record<string, any[]>>({});
   // 用于存储加载状态
   const [expandedRowLoading, setExpandedRowLoading] = useState<Record<string, boolean>>({});
-  
+
   // 用于存储查询参数
   const [searchParams, setSearchParams] = useState<any>({});
 
   const latestDateRef = useRef<number>(0);
-
+  // 在组件顶部定义状态
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
+    dayjs(),
+    dayjs()
+  ]);
+  const dateFormat = 'YYYY-MM-DD';
   // 重构: 创建一个通用函数来处理数据格式化和设置
   const processData = (data: any[]) => {
     dataAll.current = data;
@@ -68,8 +74,14 @@ const YiDong: React.FC = () => {
       try {
         const latestDate = await getLatestDate();
         latestDateRef.current = latestDate.data;
+
+        setDateRange([
+          dayjs(formatYYYYMMDDToStr(latestDate.data), dateFormat),
+          dayjs(formatYYYYMMDDToStr(latestDate.data), dateFormat)
+        ]);
+
         const response = await getCommonData(104, { t_date: latestDate.data });
-        
+
         if (response && response.data && Array.isArray(response.data)) {
           // 使用重构后的函数处理数据
           processData(response.data);
@@ -81,14 +93,14 @@ const YiDong: React.FC = () => {
 
     checkFileExists();
   }, []);
-  
+
   // 处理查询提交的函数
   const handleSearch = async (values: any) => {
     try {
       setSearchParams(values);
       // 调用API获取数据，传递查询参数
-     if(values.t_date){
-       if (Array.isArray(values.t_date)) {
+      if (values.t_date) {
+        if (Array.isArray(values.t_date)) {
           // 如果是数组，检查每个元素的类型
           values.t_date = values.t_date.map((date: any) => {
             return formatDateToYYYYMMDD(date);
@@ -97,20 +109,20 @@ const YiDong: React.FC = () => {
           // 单个日期处理
           values.t_date = formatDateToYYYYMMDD(values.t_date);
         }
-      }else{
+      } else {
         // 给默认值
         values.t_date = latestDateRef.current;
       }
       // 改成模糊查询
-      if(values.plate_name){
+      if (values.plate_name) {
         values.plate_name = `%${values.plate_name.trim()}%`;
       }
-      if(values.name){
+      if (values.name) {
         values.name = `%${values.name.trim()}%`;
       }
       console.log('查询参数:', values);
       const response = await getCommonData(104, values);
-      
+
       if (response && response.data && Array.isArray(response.data)) {
         // 使用重构后的函数处理数据
         processData(response.data);
@@ -126,13 +138,13 @@ const YiDong: React.FC = () => {
       ...prev,
       [record.plate_id]: true
     }));
-    
+
     try {
-        console.log('获取展开行数据 for record:', record);
-        setExpandedRowData(prev => ({
-          ...prev,
-          [record.plate_id]: dataAll.current.filter((item: any) => item.plate_id === record.plate_id)
-        }));
+      console.log('获取展开行数据 for record:', record);
+      setExpandedRowData(prev => ({
+        ...prev,
+        [record.plate_id]: dataAll.current.filter((item: any) => item.plate_id === record.plate_id)
+      }));
     } catch (error) {
       console.error('获取展开行数据失败:', error);
     } finally {
@@ -143,55 +155,58 @@ const YiDong: React.FC = () => {
       }));
     }
   }, []);
-  
+
   return (
     <div>
-    <LightFilter layout="horizontal" bordered  size="middle"
-      onFinish={handleSearch}>
-      <ProFormText name="plate_name" label="题材" 
-        labelCol={{ span: 8 }} 
-        wrapperCol={{ span: 16 }} />
-      <ProFormDateRangePicker name="t_date" label="日期"
+      <LightFilter layout="horizontal" bordered size="middle"
+        initialValues={{
+          t_date: dateRange
+        }}
+        onFinish={handleSearch}>
+        <ProFormDateRangePicker name="t_date" label="日期" initialValue={dateRange} />
+        <ProFormText name="plate_name" label="题材"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }} />
+
+        <ProFormText name="name" label="股票"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }} />
+        <ProFormDigitRange
+          label="涨停数量"
+          name="zt_count"
+          separator="-"
+          placeholder={['最小值', '最大值']}
+          separatorWidth={30}
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }} />
+      </LightFilter>
+      <ProTable<any>
+        columns={columns}
+        request={() => {
+          return Promise.resolve({
+            data: tableData,
+            success: true,
+          });
+        }}
+        dataSource={tableData}
+        size="small"
+        rowKey="key"
+        pagination={false}
+        expandable={{
+          expandedRowRender: (record) => (
+            <ExpandedContent
+              record={record}
+              fetchData={fetchExpandedRowData}
+              data={expandedRowData[record.plate_id] || []}
+              loading={expandedRowLoading[record.plate_id] || false}
+            />
+          )
+        }}
+        search={false}
+        dateFormatter="string"
+        headerTitle="涨停题材列表"
+        options={false}
       />
-      <ProFormText name="name" label="股票" 
-        labelCol={{ span: 8 }} 
-        wrapperCol={{ span: 16 }} />
-      <ProFormDigitRange
-              label="涨停数量"
-              name="zt_count"
-              separator="-"
-              placeholder={['最小值', '最大值']}
-              separatorWidth={30}
-              labelCol={{ span: 8 }} 
-              wrapperCol={{ span: 16 }} />
-    </LightFilter>
-    <ProTable<any>
-      columns={columns}
-      request={() => {
-        return Promise.resolve({
-          data: tableData,
-          success: true,
-        });
-      }}
-      dataSource={tableData}
-      size="small"
-      rowKey="key"
-      pagination={false}
-      expandable={{
-        expandedRowRender: (record) => (
-          <ExpandedContent 
-            record={record} 
-            fetchData={fetchExpandedRowData} 
-            data={expandedRowData[record.plate_id] || []}
-            loading={expandedRowLoading[record.plate_id] || false}
-          />
-        )
-      }}
-      search={false}
-      dateFormatter="string"
-      headerTitle="涨停题材列表"
-      options={false}
-    />
     </div>
   );
 };

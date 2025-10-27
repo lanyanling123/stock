@@ -73,7 +73,15 @@ namespace StockAPI.Data
                 if (!columns.ContainsKey(key)) continue; // 字段不存在则忽略
 
                 var paramName = $"@{key}";
-                if (value.Contains(","))
+                if (item.Key.Contains("[]"))
+                {
+                    // t_date[]=20251016,t_date=20251017  这种格式，转换为 t_date >= 20251016 and t_date <= 20251017
+                    parameters[$"@{key}_start"] = ConvertToDbType(value.Split(',')[0], columns[key]);
+                    parameters[$"@{key}_end"] = ConvertToDbType(value.Split(',')[1], columns[key]);
+
+                    whereList.Add($"\"{key}\" >= @{key}_start AND \"{key}\" <= @{key}_end");
+                }
+                else if (value.Contains(","))
                 {
                     // 包含逗号的，则使用in查询
                     var paramList = new List<string>();

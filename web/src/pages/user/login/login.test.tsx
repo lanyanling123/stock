@@ -39,7 +39,7 @@ describe('Login Page', () => {
       />,
     );
 
-    await rootContainer.findAllByText('Ant Design');
+    await rootContainer.findAllByText('StockView');
 
     act(() => {
       historyRef.current?.push('/user/login');
@@ -49,7 +49,7 @@ describe('Login Page', () => {
       rootContainer.baseElement?.querySelector('.ant-pro-form-login-desc')
         ?.textContent,
     ).toBe(
-      'Ant Design is the most influential web design specification in Xihu district',
+      'StockView is the most influential web design specification in Xihu district',
     );
 
     expect(rootContainer.asFragment()).toMatchSnapshot();
@@ -68,7 +68,7 @@ describe('Login Page', () => {
       />,
     );
 
-    await rootContainer.findAllByText('Ant Design');
+    await rootContainer.findAllByText('StockView');
 
     const userNameInput = await rootContainer.findByPlaceholderText(
       'Username: admin or user',
@@ -91,7 +91,7 @@ describe('Login Page', () => {
     // 等待接口返回结果
     await waitTime(5000);
 
-    await rootContainer.findAllByText('Ant Design Pro');
+    await rootContainer.findAllByText('StockView Pro');
 
     expect(rootContainer.asFragment()).toMatchSnapshot();
 

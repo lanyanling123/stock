@@ -116,7 +116,7 @@ const Welcome: React.FC = () => {
               color: token.colorTextHeading,
             }}
           >
-            欢迎使用 Ant Design Pro
+            欢迎使用 StockView Pro
           </div>
           <p
             style={{
@@ -128,8 +128,8 @@ const Welcome: React.FC = () => {
               width: '65%',
             }}
           >
-            Ant Design Pro 是一个整合了 umi，Ant Design 和 ProComponents
-            的脚手架方案。致力于在设计规范和基础组件的基础上，继续向上构建，提炼出典型模板/业务组件/配套设计资源，进一步提升企业级中后台产品设计研发过程中的『用户』和『设计者』的体验。
+            StockView Pro 是一个在线股票复盘分析软件。它基于
+            经典缠论理论结合主流题材交易模型构建。致力于提供一站式的股票分析服务。
           </p>
           <div
             style={{
@@ -140,21 +140,21 @@ const Welcome: React.FC = () => {
           >
             <InfoCard
               index={1}
-              href="https://umijs.org/docs/introduce/introduce"
-              title="了解 umi"
-              desc="umi 是一个可扩展的企业级前端应用框架,umi 以路由为基础的，同时支持配置式路由和约定式路由，保证路由的功能完备，并以此进行功能扩展。"
+              href="/"
+              title="了解 StockView"
+              desc="StockView 是一个方便作者进行股票复盘分析的工具，把股票交易复盘过程中的每一个细节都记录下来，帮助作者更好的理解股票交易的机制。同时提供了丰富的分析工具，帮助作者更方便的进行股票交易分析。"
             />
             <InfoCard
               index={2}
-              title="了解 ant design"
-              href="https://ant.design"
-              desc="antd 是基于 Ant Design 设计体系的 React UI 组件库，主要用于研发企业级中后台产品。"
+              title="了解 缠论理论"
+              href="/"
+              desc="缠论理论是一种股票交易分析理论，缠论作者是中国著名的股票交易专家，他的理论被广泛应用于股票交易中。缠论理论强调通过对股票价格走势的分析，寻找买卖点，从而实现盈利最大化。"
             />
             <InfoCard
               index={3}
-              title="了解 Pro Components"
-              href="https://procomponents.ant.design"
-              desc="ProComponents 是一个基于 Ant Design 做了更高抽象的模板组件，以 一个组件就是一个页面为开发理念，为中后台开发带来更好的体验。"
+              title="了解 主流题材交易模型"
+              href="/"
+              desc="主流题材交易模型聚焦当前市场热点题材，分析热点题材的交易模型，核心要点是只做短线交易，只做热点题材里面的热点股票。"
             />
           </div>
         </div>

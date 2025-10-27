@@ -1,6 +1,6 @@
 Language: 🇺🇸 | [🇨🇳](./README.zh-CN.md) | [🇷🇺](./README.ru-RU.md) | [🇹🇷](./README.tr-TR.md) | [🇯🇵](./README.ja-JP.md) | [🇫🇷](./README.fr-FR.md) | [🇵🇹](./README.pt-BR.md) | [🇸🇦](./README.ar-DZ.md) | [🇪🇸](./README.es-ES.md)
 
-<h1 align="center">Ant Design Pro</h1>
+<h1 align="center">StockView Pro</h1>
 
 <div align="center">
 
@@ -27,7 +27,7 @@ An out-of-box UI solution for enterprise applications as a React boilerplate.
 
 - :bulb: **TypeScript**: A language for application-scale JavaScript
 - :scroll: **Blocks**: Build page with block template
-- :gem: **Neat Design**: Follow [Ant Design specification](http://ant.design/)
+- :gem: **Neat Design**: Follow [StockView specification](http://ant.design/)
 - :triangular_ruler: **Common Templates**: Typical templates for enterprise applications
 - :rocket: **State of The Art Development**: Newest development stack of React/umi/dva/antd
 - :iphone: **Responsive**: Designed for variable screen sizes
@@ -118,7 +118,7 @@ Modern browsers.
 
 Any type of contribution is welcome, here are some examples of how you may contribute to this project:
 
-- Use Ant Design Pro in your daily work.
+- Use StockView Pro in your daily work.
 - Submit [issues](http://github.com/ant-design/ant-design-pro/issues) to report bugs or ask questions.
 - Propose [pull requests](http://github.com/ant-design/ant-design-pro/pulls) to improve our code.
 

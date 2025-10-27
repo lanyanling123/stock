@@ -92,3 +92,79 @@ export async function removeRule(options?: { [key: string]: any }) {
     },
   });
 }
+export async function getLatestDate(
+) {
+  return request<any>(`/api/Common/latestdate`, {
+    method: 'GET',
+  });
+}
+export async function getCommonData(
+  tableId: number,
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/Common/query/${tableId}`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+export async function getTradeDate(
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/Common/tradedate`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+export async function updateCommonData(
+  tableId: number,
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/Common/update/${tableId}`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+export async function getCommonDataPaging(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/Common', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+// 导入自选股
+export async function importSelfStock(
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/Common/import/self`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}

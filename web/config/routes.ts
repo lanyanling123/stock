@@ -28,28 +28,29 @@ export default [
     icon: 'smile',
     component: './Welcome',
   },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    routes: [
-      {
-        path: '/admin',
-        redirect: '/admin/sub-page',
-      },
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        component: './Admin',
-      },
-    ],
+  // {
+  //   path: '/index-sh',
+  //   name: 'index-sh',
+  //   icon: 'home',
+  //   component: './IndexSH',
+  // },
+    {
+    path: '/yidong',
+    name: '异动',
+    icon: 'home',
+    component: './YiDong',
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './table-list',
+    path: '/ticai',
+    name: '题材',
+    icon: 'home',
+    component: './Subject',
+  },
+    {
+    path: '/zixuan',
+    name: '自选',
+    icon: 'home',
+    component: './ZiXuan',
   },
   {
     path: '/',

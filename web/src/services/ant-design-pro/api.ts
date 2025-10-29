@@ -93,8 +93,9 @@ export async function removeRule(options?: { [key: string]: any }) {
   });
 }
 export async function getLatestDate(
+    tableId: number
 ) {
-  return request<any>(`/api/Common/latestdate`, {
+  return request<any>(`/api/Common/maxdatadate/${tableId}`, {
     method: 'GET',
   });
 }
@@ -168,6 +169,18 @@ export async function importSelfStock(
     ...(options || {}),
   });
 }
+export async function importSubjectStock(
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/Common/import/subject`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
 // 删除自选股
 export async function deleteSelfStock(
   params: any,
@@ -182,22 +195,18 @@ export async function deleteSelfStock(
   });
 }
 // 获取自选股最新日期
-export async function getSelfStockNewDate(
-  params: any,
+export async function getLatestTradeDate(
   options?: { [key: string]: any },
 ) {
-  return request<any>(`/api/Common/self/latestdate`, {
+  return request<any>(`/api/Common/latestdate`, {
     method: 'GET',
-    params: {
-      ...params,
-    },
     ...(options || {}),
   });
 }
 // 获取是否交易时间
-export async function getIsTradeTime(
+export async function getIsTradeDay(
 ) {
-  return request<any>(`/api/Common/istradetime`, {
+  return request<any>(`/api/Common/istradeday`, {
     method: 'GET',
   });
 }

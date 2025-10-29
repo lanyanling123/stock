@@ -34,16 +34,10 @@ export async function getInitialState(): Promise<{
       const msg = await queryCurrentUser({
         skipErrorHandler: true,
       });
-      return msg.data;
+      return undefined //msg.data;
     } catch (_error) {
-       history.push(loginPath);
-      return {
-        name: '默认用户',
-        avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-        userid: '00000001',
-        access: 'admin',
-        unreadCount: 0,
-      };
+      // 用户未登录或认证失败时，重定向到登录页面并返回undefined
+      return undefined;
     }
   };
   // 如果不是登录页面，执行
@@ -76,11 +70,18 @@ export const layout: RunTimeLayoutConfig = ({
       <Question key="doc" />,
       <SelectLang key="SelectLang" />,
     ],
-    avatarProps: {
-      src: initialState?.currentUser?.avatar,
+    avatarProps: initialState?.currentUser ? {
+      // 用户已登录时的配置
+      src: initialState.currentUser.avatar,
       title: <AvatarName />,
       render: (_, avatarChildren) => (
-        <AvatarDropdown>{avatarChildren}</AvatarDropdown>
+        <AvatarDropdown menu={true}>{avatarChildren}</AvatarDropdown>
+      ),
+    } : {
+      title: (
+        <a key="register">
+          登录
+        </a>
       ),
     },
     waterMarkProps: {
@@ -101,9 +102,9 @@ export const layout: RunTimeLayoutConfig = ({
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
-      //  history.push(loginPath);
-      }
+      // if (!initialState?.currentUser && location.pathname !== loginPath) {
+      //   history.push(loginPath);
+      // }
     },
     bgLayoutImgList: [
       {
@@ -127,11 +128,11 @@ export const layout: RunTimeLayoutConfig = ({
     ],
     links: isDevOrTest
       ? [
-          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-            <LinkOutlined />
-            <span>OpenAPI 文档</span>
-          </Link>,
-        ]
+        <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+          <LinkOutlined />
+          <span>OpenAPI 文档</span>
+        </Link>,
+      ]
       : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面

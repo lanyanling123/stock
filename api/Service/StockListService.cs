@@ -52,12 +52,17 @@ namespace StockAPI.Service
         /// 自选股最新日期
         /// </summary>
         /// <returns></returns>
-        public async Task<int> MaxSelfDate()
+        public async Task<int> MaxDataDate(int tableid)
         {
             var connStr = _configuration.GetConnectionString("DefaultConnection");
             using var connection = new NpgsqlConnection(connStr);
+            string? tableName = GetDBObjectName(connStr, tableid);
+            if (tableName == null)
+            {
+                throw new Exception($"Table '{tableid}' does not exist.");
+            }
             // 删除
-            var sql = @"Select max(t_date) as maxdate from fupan_ticai_select";
+            var sql = @$"Select max(t_date) as maxdate from {tableName}";
             var result = await connection.ExecuteScalarAsync<int>(sql);
             return result;
         }
@@ -79,12 +84,36 @@ namespace StockAPI.Service
             var sql = @"Delete from fupan_ticai_select where t_date=@date2 and subject_id = @subjectid";
             await connection.ExecuteAsync(sql, parameters);
 
-            sql = @"Insert into fupan_ticai_select(t_date,subject_id,code,tags,order_no)
-                           select @date2, subject_id,code,tags,order_no from fupan_ticai_select
+            sql = @"Insert into fupan_ticai_select(t_date,subject_id,code,tags,order_no,flag)
+                           select @date2, subject_id,code,tags,order_no,flag from fupan_ticai_select
                            where t_date=@date1 and subject_id = @subjectid
                           ON CONFLICT (subject_id,t_date,code) DO NOTHING;";
 
             parameters.Add("date1", date1);
+            var result = await connection.ExecuteAsync(sql, parameters);
+            return result > 0;
+        }
+        /// <summary>
+        /// 从异动题材导入到自定义题材
+        /// </summary>
+        /// <param name="plate_id">异动题材ID</param>
+        /// <param name="subject_id">自定义题材ID</param>
+        /// <param name="t_date">异动日期</param>
+        /// <returns></returns>
+        public async Task<bool> ImportSubjectStock(int plate_id, int subject_id, int t_date)
+        {
+            var connStr = _configuration.GetConnectionString("DefaultConnection");
+            using var connection = new NpgsqlConnection(connStr);
+            var parameters = new DynamicParameters();
+            parameters.Add("plate_id", plate_id);
+            parameters.Add("subject_id", subject_id);
+            parameters.Add("t_date", t_date);
+
+            string sql = @"Insert into fupan_ticai_stock(subject_id,code,name)
+                           select @subject_id, code,name from jygs_yidong_stock
+                           where t_date=@t_date and plate_id = @plate_id
+                          ON CONFLICT (subject_id,code) DO NOTHING;";
+
             var result = await connection.ExecuteAsync(sql, parameters);
             return result > 0;
         }

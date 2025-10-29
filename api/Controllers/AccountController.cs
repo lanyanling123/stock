@@ -25,9 +25,10 @@ namespace StockAPI.Controllers
             };
         }
         // POST api/<AccountController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("login/outLogin")]
+        public OkResult Post()
         {
+            return Ok();
         }
 
         // PUT api/<AccountController>/5

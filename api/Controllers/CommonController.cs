@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using StockAPI.Data;
 using StockAPI.Service;
 using System.Runtime.CompilerServices;
@@ -31,6 +32,31 @@ namespace StockAPI.Controllers
                 success = true,
                 data = date
             });
+        }
+        /// <summary>
+        /// 判断当前时间是否交易时间
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("istradeday")]
+        public async Task<IActionResult> IsTradeDay()
+        {
+            try
+            {
+                var data = await _tradeDateService.IsTradeDay();
+                return Ok(new RequestResult()
+                {
+                    success = true,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new RequestResult()
+                {
+                    success = false,
+                    errorMessage = ex.Message
+                });
+            }
         }
         /// <summary>
         /// 通用接口，根据数据表名称返回数据
@@ -104,37 +130,17 @@ namespace StockAPI.Controllers
                 });
             }
         }
-        [HttpGet("self/latestdate")]
-        public async Task<IActionResult> SelfStockLatestDate()
-        {
-            try
-            {
-                var data = await _stockListService.MaxSelfDate();
-                return Ok(new RequestResult()
-                {
-                    success = true,
-                    data = data
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new RequestResult()
-                {
-                    success = false,
-                    errorMessage = ex.Message
-                });
-            }
-        }
         /// <summary>
-        /// 判断当前时间是否交易时间
+        /// 获取最新日期
         /// </summary>
+        /// <param name=""></param>
         /// <returns></returns>
-        [HttpGet("istradetime")]
-        public async Task<IActionResult> IsTradeTime()
+        [HttpGet("maxdatadate/{tableid}")]
+        public async Task<IActionResult> GetLatestDate(int tableid)
         {
             try
             {
-                var data = await _tradeDateService.IsTradeTime();
+                var data = await _stockListService.MaxDataDate(tableid);
                 return Ok(new RequestResult()
                 {
                     success = true,
@@ -150,6 +156,7 @@ namespace StockAPI.Controllers
                 });
             }
         }
+
         /// <summary>
         /// 导入自选股，在主流题材中，把前1天的自选股导入到今天的自选股
         /// </summary>
@@ -161,6 +168,34 @@ namespace StockAPI.Controllers
             try
             {
                 var data = await _stockListService.ImportSelfStock(subjectid, date1, date2);
+                return Ok(new RequestResult()
+                {
+                    success = true,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new RequestResult()
+                {
+                    success = false,
+                    errorMessage = ex.Message
+                });
+            }
+        }
+        /// <summary>
+        /// 从异动题材导入股票到自定义题材
+        /// </summary>
+        /// <param name="plate_id"></param>
+        /// <param name="subject_id"></param>
+        /// <param name="t_date"></param>
+        /// <returns></returns>
+        [HttpGet("import/subject")]
+        public async Task<IActionResult> ImportSubject(int plate_id, int subject_id, int t_date)
+        {
+            try
+            {
+                var data = await _stockListService.ImportSubjectStock(plate_id, subject_id, t_date);
                 return Ok(new RequestResult()
                 {
                     success = true,

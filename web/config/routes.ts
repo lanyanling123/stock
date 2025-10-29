@@ -9,6 +9,26 @@
  * @param name 配置路由的标题，默认读取国际化文件 menu.ts 中 menu.xxxx 的值，如配置 name 为 login，则读取 menu.ts 中 menu.login 的取值作为标题
  * @param icon 配置路由的图标，取值参考 https://ant.design/components/icon-cn， 注意去除风格后缀和大小写，如想要配置图标为 <StepBackwardOutlined /> 则取值应为 stepBackward 或 StepBackward，如想要配置图标为 <UserOutlined /> 则取值应为 user 或者 User
  * @doc https://umijs.org/docs/guides/routes
+ * SmileOutlined	smile	笑脸图标
+HomeOutlined	home	首页图标
+UserOutlined	user	用户图标
+SettingOutlined	setting	设置图标
+PieChartOutlined	pieChart	饼图图标
+BarChartOutlined	barChart	柱状图图标
+LineChartOutlined	lineChart	折线图图标
+AreaChartOutlined	areaChart	区域图图标
+MenuOutlined	menu	菜单图标
+BellOutlined	bell	铃铛图标
+SearchOutlined	search	搜索图标
+PlusOutlined	plus	加号图标
+EditOutlined	edit	编辑图标
+DeleteOutlined	delete	删除图标
+UploadOutlined	upload	上传图标
+DownloadOutlined	download	下载图标
+LeftOutlined	left	左箭头图标
+RightOutlined	right	右箭头图标
+RefreshOutlined	refresh	刷新图标
+EyeOutlined	eye	眼睛图标
  */
 export default [
   {
@@ -37,13 +57,13 @@ export default [
     {
     path: '/yidong',
     name: '异动',
-    icon: 'home',
+    icon: 'bell',
     component: './YiDong',
   },
   {
     path: '/ticai',
     name: '题材',
-    icon: 'home',
+    icon: 'menu',
     component: './Subject',
   },
     {

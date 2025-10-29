@@ -55,18 +55,19 @@ namespace StockAPI.Service
         /// 判断当前时间是否交易时间
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> IsTradeTime()
+        public async Task<bool> IsTradeDay()
         {
             var date = int.Parse(DateTime.Now.ToString("yyyyMMdd"));
             // 判断今天是否交易日
             bool isTradeDay = await IsTradeDate(date);
-            if (!isTradeDay)
-            {
-                return false;
-            }
+            return isTradeDay;
+            //if (!isTradeDay)
+            //{
+            //    return false;
+            //}
             // 判断A股市场是否是交易时间 
-            DateTime now = DateTime.Now;
-            return IsTradingTimePeriod(now);
+            //DateTime now = DateTime.Now;
+            //return IsTradingTimePeriod(now);
         }
         /// <summary>
         /// 判断时间是否在交易时段内

@@ -1,12 +1,13 @@
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, UploadOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-components';
 import { LightFilter, ProFormDatePicker, ProFormDateRangePicker, ProFormDigitRange, ProFormText, ProTable, QueryFilter } from '@ant-design/pro-components';
-import { Button, Tag } from 'antd';
+import { Button, Form, message, Tag } from 'antd';
 import React, { useState, useCallback } from 'react';
 import { useEffect, useRef } from 'react';
 import { getCommonData, getLatestDate } from '@/services/ant-design-pro/api';
 import { formatDateToYYYYMMDD, formatYYYYMMDDToStr } from '@/services/utils/dateUtils';
 import dayjs from 'dayjs';
+import { downloadData } from '@/services/ant-design-pro/jygs';
 const columns: ProColumns<any>[] = [
   {
     title: '日期',
@@ -44,6 +45,12 @@ const YiDong: React.FC = () => {
   const [searchParams, setSearchParams] = useState<any>({});
 
   const latestDateRef = useRef<number>(0);
+    // 添加：使用useForm获取表单实例
+  const [form] = Form.useForm();
+
+  // 随机数
+  const randomNum = useRef<number>(Math.random()); 
+  const [loading, setLoading] = useState<boolean>(false);
   // 在组件顶部定义状态
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
     dayjs(),
@@ -70,16 +77,21 @@ const YiDong: React.FC = () => {
   };
 
   useEffect(() => {
-    const checkFileExists = async () => {
+    const fetchData = async () => {
       try {
-        const latestDate = await getLatestDate();
+        const latestDate = await getLatestDate(108);
         latestDateRef.current = latestDate.data;
 
-        setDateRange([
+        const newDateRange = [
           dayjs(formatYYYYMMDDToStr(latestDate.data), dateFormat),
           dayjs(formatYYYYMMDDToStr(latestDate.data), dateFormat)
-        ]);
-
+        ];
+        
+        setDateRange(newDateRange);
+        // 添加：更新表单值
+        form.setFieldsValue({
+          t_date: newDateRange
+        });
         const response = await getCommonData(104, { t_date: latestDate.data });
 
         if (response && response.data && Array.isArray(response.data)) {
@@ -91,8 +103,8 @@ const YiDong: React.FC = () => {
       }
     };
 
-    checkFileExists();
-  }, []);
+    fetchData();
+  }, [randomNum]);
 
   // 处理查询提交的函数
   const handleSearch = async (values: any) => {
@@ -155,15 +167,30 @@ const YiDong: React.FC = () => {
       }));
     }
   }, []);
-
+  // 下载数据
+  const handelDownloadData = async () => {
+    try {
+      setLoading(true);
+      const response = await downloadData({date:dayjs().format(dateFormat)});
+      if (response.success) {
+        message.success('数据下载成功');
+        randomNum.current = Math.random();
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('下载数据失败:', error);
+      setLoading(false);
+    }
+  };
   return (
     <div>
       <LightFilter layout="horizontal" bordered size="middle"
+        form={form} 
         initialValues={{
           t_date: dateRange
         }}
         onFinish={handleSearch}>
-        <ProFormDateRangePicker name="t_date" label="日期" initialValue={dateRange} />
+        <ProFormDateRangePicker name="t_date" label="日期" />
         <ProFormText name="plate_name" label="题材"
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }} />
@@ -172,7 +199,7 @@ const YiDong: React.FC = () => {
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }} />
         <ProFormDigitRange
-          label="涨停数量"
+          label="题材涨停股数量"
           name="zt_count"
           separator="-"
           placeholder={['最小值', '最大值']}
@@ -206,6 +233,19 @@ const YiDong: React.FC = () => {
         dateFormatter="string"
         headerTitle="涨停题材列表"
         options={false}
+        				toolBarRender={() => [
+					<Button
+						key="importbutton"
+						color="primary"
+						variant="filled"
+						size='small'
+						loading={loading}
+						icon={<UploadOutlined />}
+						onClick={handelDownloadData}
+					>
+						下载数据
+					</Button>,
+				]}
       />
     </div>
   );
@@ -225,7 +265,7 @@ const ExpandedContent: React.FC<{
   return (
     <ProTable
       columns={[
-        { title: '股票代码', dataIndex: 'code', key: 'code' },
+        { title: '股票代码', dataIndex: 'code', key: 'code',render: (_) => <a href={`https://quote.eastmoney.com/${_}.html#fullScreenChart`} target="_blank">{_}</a> },
         { title: '股票名称', dataIndex: 'name', key: 'name' },
         { title: '价格', dataIndex: 'price', key: 'price' },
         { title: '涨停时间', dataIndex: 'time', key: 'time' },

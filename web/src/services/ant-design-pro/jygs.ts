@@ -11,3 +11,16 @@ export async function currentUser(options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
+
+export async function downloadData(
+  params: any,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/api/jygs/yidong`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}

@@ -4,7 +4,7 @@ export const stockCode2 = (code: string): string => {
     return code;
   }
   if (code.length === 6) {
-    if(code.substring(0, 1) === '6') {
+    if (code.substring(0, 1) === '6') {
       return 'sh' + code;
     } else {
       return 'sz' + code;
@@ -99,6 +99,11 @@ interface StockData {
   code: string;
   name: string;
   tags: string;
+  currentPrice: string;
+  priceChangePercent: string;
+  amount: string;
+  is_new: string;
+  is_delete: string;
 }
 
 // 转换后的单行数据接口（属性是动态的，例如 `20251024_t_date_code`）
@@ -143,11 +148,20 @@ export const transformStockData = (data: StockData[]): TransformedRow[] => {
       const codeKey = `${date}_code`;
       const nameKey = `${date}_name`;
       const tagsKey = `${date}_tags`;
-
+      const currentPriceKey = `${date}_currentPrice`;
+      const priceChangePercentKey = `${date}_priceChangePercent`;
+      const amountKey = `${date}_amount`;
+      const isNewKey = `${date}_is_new`;
+      const isDeleteKey = `${date}_is_delete`;
       // 赋值，如果该日期组在当前行没有数据，则对应列的值为 undefined（在表格中显示为空）
       newRow[codeKey] = dataItem?.code;
       newRow[nameKey] = dataItem?.name;
       newRow[tagsKey] = dataItem?.tags;
+      newRow[currentPriceKey] = dataItem?.currentPrice;
+      newRow[priceChangePercentKey] = dataItem?.priceChangePercent;
+      newRow[amountKey] = dataItem?.amount;
+      newRow[isNewKey] = dataItem?.is_new;
+      newRow[isDeleteKey] = dataItem?.is_delete;
     }
 
     result.push(newRow);
@@ -155,3 +169,23 @@ export const transformStockData = (data: StockData[]): TransformedRow[] => {
 
   return result;
 }
+// 判断当前是否为A股交易时间
+export const isTradeTime = (): boolean => {
+  const time = new Date();
+  const currentTime = time.getTime(); // 获取当前时间的时间戳
+  const today = new Date(time).setHours(0, 0, 0, 0); // 获取当天0点的时间戳
+
+  // 定义四个关键时间点的时间戳
+  const amStart = today + (9 * 60 + 15) * 60 * 1000;  // 9:15
+  const amStartContinuous = today + (9 * 60 + 30) * 60 * 1000; // 9:30
+  const amEnd = today + (11 * 60 + 30) * 60 * 1000;   // 11:30
+  const pmStart = today + (13 * 60 + 0) * 60 * 1000;  // 13:00
+  const pmEndContinuous = today + (14 * 60 + 57) * 60 * 1000; // 14:57
+  const marketClose = today + (15 * 60 + 0) * 60 * 1000;     // 15:00
+
+  // 判断当前时间是否在任意一个交易时段内
+  return (currentTime >= amStart && currentTime < amStartContinuous) || // 开盘集合竞价 (9:15-9:30)
+    (currentTime >= amStartContinuous && currentTime <= amEnd) ||   // 早盘连续竞价 (9:30-11:30)
+    (currentTime >= pmStart && currentTime < pmEndContinuous) ||    // 午盘连续竞价 (13:00-14:57)
+    (currentTime >= pmEndContinuous && currentTime <= marketClose);  // 收盘集合竞价 (14:57-15:00)
+};

@@ -48,10 +48,10 @@ namespace StockAPI
                 options.AddPolicy("AllowWebApp", policy =>
                 {
                     policy.WithOrigins(
-                            "http://localhost:9000",
-                            "https://localhost:9000",
+                            "http://51fupan.cn",
+                            "https://51fupan.cn",
                             "http://127.0.0.1:5500",
-                            "http://localhost:8080"
+                            "http://localhost:8000"
                         )
                         .AllowAnyMethod()
                         .AllowAnyHeader()

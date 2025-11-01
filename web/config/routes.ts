@@ -60,18 +60,18 @@ export default [
     icon: 'bell',
     component: './YiDong',
   },
-  {
-    path: '/ticai',
-    name: '题材',
-    icon: 'menu',
-    component: './Subject',
-  },
-    {
-    path: '/zixuan',
-    name: '自选',
-    icon: 'home',
-    component: './ZiXuan',
-  },
+  // {
+  //   path: '/ticai',
+  //   name: '题材',
+  //   icon: 'menu',
+  //   component: './Subject',
+  // },
+  //   {
+  //   path: '/zixuan',
+  //   name: '自选',
+  //   icon: 'home',
+  //   component: './ZiXuan',
+  // },
   {
     path: '/',
     redirect: '/welcome',

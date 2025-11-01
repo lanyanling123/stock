@@ -163,7 +163,7 @@ public class JiuyangongsheService
             using var connection = new NpgsqlConnection(connStr);
             foreach (var fieldData in response.Data)
             {
-                if(fieldData.List== null || fieldData.List.Count == 0)
+                if(fieldData.List== null || fieldData.List.Count == 0 || fieldData.Name == "其他" || fieldData.Name == "公告" || fieldData.Name == "ST板块")
                 {
                     continue;
                 }

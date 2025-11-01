@@ -54,6 +54,8 @@ const ZiXuan: React.FC = () => {
 	// 3. 添加查询参数状态
 	const searchParmasRef = useRef<any>(null);
 
+	const [subjectName, setSubjectName] = useState<string>('');
+
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	// 添加排序状态
@@ -133,6 +135,7 @@ const ZiXuan: React.FC = () => {
 				</span>
 			);
 			const subjectName = searchParmasRef.current == null ? '辨识度' : mainSubjectOptions.find((item: any) => item.value == searchParmasRef.current.subject_id).label;
+			setSubjectName(subjectName);
 			// 更新标题
 			setTableTitle(
 				<>
@@ -676,7 +679,7 @@ const ZiXuan: React.FC = () => {
 								title: '名称',
 								className: bgColorClass,
 								render: (_, record) => {
-									let color = record[col.t_date + '_is_new'] == 1 ? 'yellow' : record[col.t_date + '_is_delete'] == 1 ? 'Fuchsia' : '';
+									let color = record[col.t_date + '_is_new'] == 1 ? 'Lime' : record[col.t_date + '_is_delete'] == 1 ? 'Fuchsia' : '';
 									return <span style={{ color }}>{record[col.t_date + '_name'] || '-'}</span>;
 								}
 							},
@@ -738,7 +741,7 @@ const ZiXuan: React.FC = () => {
 	return (
 		<>
 			<Modal
-				title="新增自选股"
+				title={`新增自选股到${subjectName}`}
 				open={isStockModalVisible}
 				onCancel={() => setIsStockModalVisible(false)}
 				footer={[
@@ -791,7 +794,7 @@ const ZiXuan: React.FC = () => {
 				</Form>
 			</Modal>
 			<Modal
-				title="导入自选股"
+				title={`导入自选股到${subjectName}`}
 				open={isImportStockModalVisible}
 				onCancel={() => setIsImportStockModalVisible(false)}
 				footer={[

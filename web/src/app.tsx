@@ -87,18 +87,6 @@ export const layout: RunTimeLayoutConfig = ({
     waterMarkProps: {
       content: initialState?.currentUser?.name,
     },
-    footerRender: () => (
-      <Footer
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'none',
-          zIndex: 10,
-        }}
-      />
-    ),
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
@@ -169,6 +157,6 @@ export const layout: RunTimeLayoutConfig = ({
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const request: RequestConfig = {
-  baseURL: isDev ? '' : 'https://proapi.azurewebsites.net',
+  baseURL: isDev ? '' : '',
   ...errorConfig,
 };

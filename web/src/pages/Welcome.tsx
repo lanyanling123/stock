@@ -87,79 +87,112 @@ const Welcome: React.FC = () => {
   const { token } = theme.useToken();
   const { initialState } = useModel('@@initialState');
   return (
-    <PageContainer>
-      <Card
-        style={{
-          borderRadius: 8,
-        }}
-        styles={{
-          body: {
-            backgroundImage:
-              initialState?.settings?.navTheme === 'realDark'
-                ? 'background-image: linear-gradient(75deg, #1A1B1F 0%, #191C1F 100%)'
-                : 'background-image: linear-gradient(75deg, #FBFDFF 0%, #F5F7FF 100%)',
-          },
-        }}
-      >
-        <div
+    <div style={{ position: 'relative', minHeight: '100vh' }}>
+      <PageContainer style={{ paddingBottom: '80px' }}>
+        <Card
           style={{
-            backgroundPosition: '100% -30%',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: '274px auto',
-            backgroundImage:
-              "url('https://gw.alipayobjects.com/mdn/rms_a9745b/afts/img/A*BuFmQqsB2iAAAAAAAAAAAAAAARQnAQ')",
+            borderRadius: 8,
+            marginBottom: 24,
+          }}
+          styles={{
+            body: {
+              backgroundImage:
+                initialState?.settings?.navTheme === 'realDark'
+                  ? 'background-image: linear-gradient(75deg, #1A1B1F 0%, #191C1F 100%)'
+                  : 'background-image: linear-gradient(75deg, #FBFDFF 0%, #F5F7FF 100%)',
+            },
           }}
         >
           <div
             style={{
-              fontSize: '20px',
-              color: token.colorTextHeading,
+              backgroundPosition: '100% -30%',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '274px auto',
+              backgroundImage:
+                "url('https://gw.alipayobjects.com/mdn/rms_a9745b/afts/img/A*BuFmQqsB2iAAAAAAAAAAAAAAARQnAQ')",
             }}
           >
-            欢迎使用 StockView Pro
+            <div
+              style={{
+                fontSize: '20px',
+                color: token.colorTextHeading,
+              }}
+            >
+              欢迎使用 StockView Pro
+            </div>
+            <p
+              style={{
+                fontSize: '14px',
+                color: token.colorTextSecondary,
+                lineHeight: '22px',
+                marginTop: 16,
+                marginBottom: 32,
+                width: '65%',
+              }}
+            >
+              StockView Pro 是一个在线股票复盘分析软件。它基于
+              经典缠论理论结合主流题材交易模型构建。致力于提供一站式的股票分析服务。
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 16,
+              }}
+            >
+              <InfoCard
+                index={1}
+                href="/"
+                title="了解 StockView"
+                desc="StockView 是一个方便作者进行股票复盘分析的工具，把股票交易复盘过程中的每一个细节都记录下来，帮助作者更好的理解股票交易的机制。同时提供了丰富的分析工具，帮助作者更方便的进行股票交易分析。"
+              />
+              <InfoCard
+                index={2}
+                title="了解 缠论理论"
+                href="/"
+                desc="缠论理论是一种股票交易分析理论，缠论作者是中国著名的股票交易专家，他的理论被广泛应用于股票交易中。缠论理论强调通过对股票价格走势的分析，寻找买卖点，从而实现盈利最大化。"
+              />
+              <InfoCard
+                index={3}
+                title="了解 主流题材交易模型"
+                href="/"
+                desc="主流题材交易模型聚焦当前市场热点题材，分析热点题材的交易模型，核心要点是只做短线交易，只做热点题材里面的热点股票。"
+              />
+            </div>
           </div>
-          <p
-            style={{
-              fontSize: '14px',
-              color: token.colorTextSecondary,
-              lineHeight: '22px',
-              marginTop: 16,
-              marginBottom: 32,
-              width: '65%',
-            }}
+        </Card>
+      </PageContainer>
+      
+      {/* 版权信息和备案信息 - 固定在页面底部 */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          fontSize: '12px',
+          color: token.colorTextTertiary,
+          lineHeight: '20px',
+          padding: '16px 0',
+          borderTop: `1px solid ${token.colorBorderSecondary}`,
+          backgroundColor: token.colorBgContainer,
+          zIndex: 1000,
+        }}
+      >
+        <div>Copyright © 2024 StockView Pro. All rights reserved.</div>
+        <div>
+          <a 
+            href="https://beian.miit.gov.cn" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ color: token.colorTextTertiary, textDecoration: 'none' }}
           >
-            StockView Pro 是一个在线股票复盘分析软件。它基于
-            经典缠论理论结合主流题材交易模型构建。致力于提供一站式的股票分析服务。
-          </p>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 16,
-            }}
-          >
-            <InfoCard
-              index={1}
-              href="/"
-              title="了解 StockView"
-              desc="StockView 是一个方便作者进行股票复盘分析的工具，把股票交易复盘过程中的每一个细节都记录下来，帮助作者更好的理解股票交易的机制。同时提供了丰富的分析工具，帮助作者更方便的进行股票交易分析。"
-            />
-            <InfoCard
-              index={2}
-              title="了解 缠论理论"
-              href="/"
-              desc="缠论理论是一种股票交易分析理论，缠论作者是中国著名的股票交易专家，他的理论被广泛应用于股票交易中。缠论理论强调通过对股票价格走势的分析，寻找买卖点，从而实现盈利最大化。"
-            />
-            <InfoCard
-              index={3}
-              title="了解 主流题材交易模型"
-              href="/"
-              desc="主流题材交易模型聚焦当前市场热点题材，分析热点题材的交易模型，核心要点是只做短线交易，只做热点题材里面的热点股票。"
-            />
-          </div>
+            粤ICP备2025487920号-1
+          </a>
         </div>
-      </Card>
-    </PageContainer>
+      </div>
+    </div>
   );
 };
 

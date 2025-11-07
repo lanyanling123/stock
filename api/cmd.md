@@ -44,9 +44,7 @@ WantedBy=multi-user.target
 
 
 
-# nginx 配置文件示例
 
-vim /etc/nginx/nginx.conf
 
 ​​启用并启动服务​​：
 # 重新加载systemd配置，使其识别新服务
@@ -61,6 +59,10 @@ sudo systemctl start stockapi.service
 ​​重启服务​​：sudo systemctl restart stockapi.service
 ​​查看实时日志​​：sudo journalctl -u stockapi.service -f
 
+
+# nginx 配置文件示例
+
+vim /etc/nginx/conf/nginx.conf
 
 # 查看状态
 systemctl status nginx

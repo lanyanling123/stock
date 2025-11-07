@@ -1,0 +1,240 @@
+-- DROP FUNCTION public.ins_futures_contract_info_czce(json);
+
+CREATE OR REPLACE FUNCTION public.ins_futures_contract_info_czce(data_json json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+INSERT INTO public.futures_contract_info
+(symbol, open_date, due_date)
+select x.合约代码, x.第一交易日, x.最后交割日
+ from json_to_recordset(data_json) x 
+(
+    合约代码 text,
+    第一交易日 date,
+    最后交割日 date
+)
+ON CONFLICT(symbol)
+DO NOTHING;
+
+END;
+$function$
+;
+
+-- DROP FUNCTION public.ins_futures_contract_info_dce(json);
+
+CREATE OR REPLACE FUNCTION public.ins_futures_contract_info_dce(data_json json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+INSERT INTO public.futures_contract_info
+(symbol, open_date, due_date)
+select x.合约代码, x.开始交易日, x.最后交易日
+ from json_to_recordset(data_json) x 
+(
+    合约代码 text,
+    开始交易日 date,
+    最后交易日 date
+)
+ON CONFLICT(symbol)
+DO NOTHING;
+
+END;
+$function$
+;
+
+-- DROP FUNCTION public.ins_futures_contract_info_shfe(json);
+
+CREATE OR REPLACE FUNCTION public.ins_futures_contract_info_shfe(data_json json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+INSERT INTO public.futures_contract_info
+(symbol, open_date, due_date)
+select x.合约代码, x.上市日, x.到期日
+ from json_to_recordset(data_json) x 
+(
+    合约代码 text,
+    上市日 date,
+    到期日 date,
+    开始交割日 date,
+    最后交割日 date,
+    挂牌基准价 real,
+    交易日 timestamp,
+    更新时间 timestamp
+)
+ON CONFLICT(symbol)
+DO NOTHING;
+
+END;
+$function$
+;
+
+-- DROP FUNCTION public.ins_futures_daily(json);
+
+CREATE OR REPLACE FUNCTION public.ins_futures_daily(data_json json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+INSERT INTO public.futures_daily
+(symbol, t_date, "open", high, low, "close", volume, open_interest, turnover, settle, pre_settle, variety)
+select x.symbol,x.date,x.open,x.high,x.low,x.close
+,x.volume,x.open_interest,x.turnover,x.settle,x.pre_settle
+,x.variety
+ from json_to_recordset(data_json) x 
+(
+	symbol text,
+    date date,
+    open real,
+    high real,
+    low real,
+    close real,
+    volume real,
+    open_interest real,
+    turnover real,
+    settle real,
+    pre_settle real,
+    variety text
+)
+ON CONFLICT(symbol,t_date)
+DO NOTHING;
+
+END;
+$function$
+;
+
+-- DROP FUNCTION public.ins_futures_spot_price_daily(json);
+
+CREATE OR REPLACE FUNCTION public.ins_futures_spot_price_daily(data_json json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+insert into futures_spot_price_daily(symbol,spot_price,near_contract,near_contract_price,dominant_contract
+,dominant_contract_price,near_basis,dom_basis,near_basis_rate,dom_basis_rate
+,t_date)
+select x.symbol,x.spot_price,x.near_contract,x.near_contract_price,x.dominant_contract
+,x.dominant_contract_price,x.near_basis,x.dom_basis,x.near_basis_rate,x.dom_basis_rate
+,x.date
+ from json_to_recordset(data_json) x 
+(
+    symbol text,
+    spot_price real,
+    near_contract text,
+    near_contract_price real,
+    dominant_contract text,
+    dominant_contract_price real,
+    near_basis real,
+    dom_basis real,
+    near_basis_rate real,
+    dom_basis_rate real,
+    date int4
+)
+ON CONFLICT(symbol,t_date)
+DO NOTHING;
+
+END;
+$function$
+;
+
+-- DROP FUNCTION public.ins_futures_warehouse_receipt(text, text, json);
+
+CREATE OR REPLACE FUNCTION public.ins_futures_warehouse_receipt(_t_date text, _symbol text, data_json json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+insert into futures_warehouse_receipt
+(receipt_quantity, daily_change, valid_forecast, premium_discount, symbol, t_date)
+select x.仓单数量, x.当日增减, x.有效预报, x.升贴水,_symbol,_t_date::int
+ from json_to_recordset(data_json) x 
+(
+    仓库编号 text,
+    仓库简称 text,
+    年度 text,
+    等级 text,
+    品牌 text,
+    仓单数量 text,
+    当日增减 text,
+    有效预报 text,
+    升贴水 text
+) where x.仓库编号='总计'
+ON CONFLICT(symbol,t_date)
+DO NOTHING;
+
+END;
+$function$
+;
+
+-- DROP FUNCTION public.ins_futures_zh_minute_sina(varchar, json);
+
+CREATE OR REPLACE FUNCTION public.ins_futures_zh_minute_sina(_symbol character varying, data_json json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+INSERT INTO public.futures_zh_minute_sina
+(datetime, "open", high, low, "close", volume, "hold", t_date, symbol)
+select x.datetime, x.open, x.high, x.low, x.close, x.volume, x.hold,cast(to_char(x.datetime, 'YYYYMMDD') as int),_symbol
+ from json_to_recordset(data_json) x 
+(
+    datetime timestamp,
+    open real,
+    high real,
+    low real,
+    close real,
+    volume real,
+    hold real
+)
+ON CONFLICT(symbol,datetime)
+DO NOTHING;
+
+END;
+$function$
+;
+
+-- DROP FUNCTION public.ins_tool_trade_date_hist_sina(json);
+
+CREATE OR REPLACE FUNCTION public.ins_tool_trade_date_hist_sina(json)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+
+declare row_cnt int :=0;
+BEGIN
+
+insert into tool_trade_date_hist_sina(t_date)
+select cast(to_char(x.trade_date, 'YYYYMMDD') as int) from json_to_recordset($1) x 
+(
+trade_date timestamp
+)
+ON CONFLICT(t_date)
+DO NOTHING;
+
+END;
+$function$
+;

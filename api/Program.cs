@@ -1,8 +1,14 @@
 
+using Hangfire;
+using Hangfire.Dashboard.BasicAuthorization;
+using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.RateLimiting;
 using Npgsql;
 using StockAPI.Service;
+using StockAPI.Service.Jobs;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 namespace StockAPI
 {
@@ -33,15 +39,19 @@ namespace StockAPI
             builder.Services.AddScoped<TradeDateService>();
             builder.Services.AddScoped<ReviewSubjectSrc>();
 
+            builder.Services.AddScoped<AkshareData>();
 
-            // ע�ᶨʱ����
-            builder.Services.AddHostedService<StockAPI.Service.Jobs.PeriodicJobService>();
             // Program.cs �� Startup.cs ���ã������Ҫ��
             builder.Services.Configure<RouteOptions>(options =>
             {
                 options.LowercaseUrls = true;
                 options.LowercaseQueryStrings = true;
             });
+
+            builder.Services.AddHangfire(config => config.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+
+            builder.Services.AddHangfireServer(); // 启动后台作业处理器
+
             // ����CORS
             builder.Services.AddCors(options =>
             {
@@ -67,8 +77,47 @@ namespace StockAPI
                 });
             });
 
-            var app = builder.Build();
+            // 注册速率限制服务
+            builder.Services.AddRateLimiter(options => {
+                // 添加一个名为 "FixedWindow" 的固定窗口限流器
+                options.AddFixedWindowLimiter("FixedWindow", policyOptions => {
+                    policyOptions.PermitLimit = 20;    // 时间窗口内允许的请求数
+                    policyOptions.Window = TimeSpan.FromSeconds(10); // 时间窗口长度（10秒）
+                    policyOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    policyOptions.QueueLimit = 2;     // 允许排队的请求数
+                });
+                // 你还可以在这里添加其他策略，如滑动窗口（AddSlidingWindowLimiter）或令牌桶（AddTokenBucketLimiter）
+            });
 
+            var app = builder.Build();
+            app.UseRouting();
+            app.UseRateLimiter();
+            // 将限流策略应用到控制器路由
+            app.MapControllers().RequireRateLimiting("FixedWindow");
+
+            // 初始化Hangfire作业
+            HangfireJobInitializer.InitializeHangfireJobs(app.Services, builder.Configuration);
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[]
+                {
+                   new BasicAuthAuthorizationFilter(
+                            new BasicAuthAuthorizationFilterOptions
+                            {
+                                SslRedirect = false,
+                                RequireSsl = false,
+                                LoginCaseSensitive = false,
+                                Users = new[]
+                                {
+                                            new BasicAuthAuthorizationUser
+                                            {
+                                                Login = builder.Configuration["Hangfire:Login"] ,
+                                                PasswordClear= builder.Configuration["Hangfire:PasswordClear"]
+                                            }
+                                }
+                            })
+                },
+            });
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

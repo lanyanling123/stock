@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务调度监控面板</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .job-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .running { background-color: #d4edda; }
+        .paused { background-color: #fff3cd; }
+        .stopped { background-color: #f8d7da; }
+        .btn { padding: 8px 15px; margin: 5px; border: none; border-radius: 3px; cursor: pointer; }
+        .btn-start { background-color: #28a745; color: white; }
+        .btn-stop { background-color: #dc3545; color: white; }
+        .btn-pause { background-color: #ffc107; color: black; }
+        .btn-run { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <h1>📊 任务调度监控面板</h1>
+    
+    <div id="status-summary">
+        <h3>系统状态</h3>
+        <div id="summary-chart" style="width: 600px; height: 300px;"></div>
+    </div>
+    
+    <div id="job-list">
+        <h3>任务列表</h3>
+        <button onclick="refreshJobs()">🔄 刷新</button>
+        <div id="jobs-container"></div>
+    </div>
+
+    <script>
+        async function loadJobs() {
+            try {
+                const response = await fetch('/api/v1/jobs/status');
+                const data = await response.json();
+                displayJobs(data.jobs);
+                updateSummaryChart(data.jobs);
+            } catch (error) {
+                console.error('加载任务失败:', error);
+            }
+        }
+
+        function displayJobs(jobs) {
+            const container = document.getElementById('jobs-container');
+            container.innerHTML = '';
+            
+            jobs.forEach(job => {
+                const card = document.createElement('div');
+                card.className = `job-card ${job.status}`;
+                
+                card.innerHTML = `
+                    <h4>${job.name} (${job.id})</h4>
+                    <p><strong>状态:</strong> <span class="status-${job.status}">${getStatusText(job.status)}</span></p>
+                    <p><strong>下次执行:</strong> ${job.next_run_time || '无'}</p>
+                    <p><strong>上次执行:</strong> ${job.last_run_time || '无'}</p>
+                    <p><strong>执行次数:</strong> ${job.run_count || 0}</p>
+                    <div>
+                        <button class="btn btn-run" onclick="runJob('${job.id}')">立即执行</button>
+                        ${job.status === 'running' ? 
+                            `<button class="btn btn-pause" onclick="pauseJob('${job.id}')">暂停</button>` : 
+                            `<button class="btn btn-start" onclick="startJob('${job.id}')">启动</button>`}
+                        <button class="btn btn-stop" onclick="stopJob('${job.id}')">停止</button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'running': '🟢 运行中',
+                'paused': '🟡 已暂停', 
+                'stopped': '🔴 已停止'
+            };
+            return statusMap[status] || status;
+        }
+
+        function updateSummaryChart(jobs) {
+            const chart = echarts.init(document.getElementById('summary-chart'));
+            
+            const statusCount = {
+                running: jobs.filter(j => j.status === 'running').length,
+                paused: jobs.filter(j => j.status === 'paused').length,
+                stopped: jobs.filter(j => j.status === 'stopped').length
+            };
+            
+            const option = {
+                title: { text: '任务状态分布' },
+                tooltip: { trigger: 'item' },
+                series: [{
+                    name: '任务状态',
+                    type: 'pie',
+                    radius: '50%',
+                    data: [
+                        { value: statusCount.running, name: '运行中', itemStyle: { color: '#28a745' } },
+                        { value: statusCount.paused, name: '已暂停', itemStyle: { color: '#ffc107' } },
+                        { value: statusCount.stopped, name: '已停止', itemStyle: { color: '#dc3545' } }
+                    ]
+                }]
+            };
+            
+            chart.setOption(option);
+        }
+
+        async function runJob(jobId) {
+            await fetch(`/api/v1/jobs/${jobId}/run`, { method: 'POST' });
+            refreshJobs();
+        }
+
+        async function startJob(jobId) {
+            await fetch(`/api/v1/jobs/${jobId}/resume`, { method: 'POST' });
+            refreshJobs();
+        }
+
+        async function pauseJob(jobId) {
+            await fetch(`/api/v1/jobs/${jobId}/pause`, { method: 'POST' });
+            refreshJobs();
+        }
+
+        async function stopJob(jobId) {
+            await fetch(`/api/v1/jobs/${jobId}/stop`, { method: 'POST' });
+            refreshJobs();
+        }
+
+        function refreshJobs() {
+            loadJobs();
+        }
+
+        // 页面加载时自动刷新
+        document.addEventListener('DOMContentLoaded', loadJobs);
+        // 每30秒自动刷新
+        setInterval(loadJobs, 30000);
+    </script>
+</body>
+</html>

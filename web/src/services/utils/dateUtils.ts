@@ -77,8 +77,8 @@ export const formatYYYYMMDDToStr = (dateString: number | string | undefined): st
   const str = String(dateString);
   if (str.length !== 8) return undefined;
   const year = parseInt(str.substring(0, 4), 10);
-  const month = parseInt(str.substring(4, 6), 10); // 月份从0开始
-  const day = parseInt(str.substring(6, 8), 10);
+  const month = String(parseInt(str.substring(4, 6), 10)).padStart(2, '0'); // 月份从0开始
+  const day = String(parseInt(str.substring(6, 8), 10)).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 /**

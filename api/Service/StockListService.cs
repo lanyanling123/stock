@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using StockAPI.Data;
+using StockAPI.Models;
 using System.Data;
 
 namespace StockAPI.Service
@@ -24,7 +25,7 @@ namespace StockAPI.Service
         {
             var connStr = _configuration.GetConnectionString("DefaultConnection");
             using var connection = new NpgsqlConnection(connStr);
-            var sql = "SELECT name FROM stock_board_industry_cons_em WHERE code = @Symbol LIMIT 1";
+            var sql = "SELECT name FROM akshare.stock_board_industry_cons_em WHERE code = @Symbol LIMIT 1";
             var name = await connection.QueryFirstOrDefaultAsync<string>(sql, new { Symbol = symbol.Split('.')[0] });
             return name ?? "Unknown";
         }
@@ -290,6 +291,19 @@ namespace StockAPI.Service
             {
                 yield return item;
             }
+        }
+        /// <summary>
+        /// 获取股票列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<StockList>> GetStockList()
+        {
+            var connStr = _configuration.GetConnectionString("DefaultConnection");
+            using var connection = new NpgsqlConnection(connStr);
+
+            // 直接查询，返回 dynamic 对象集合
+            var results = await connection.QueryAsync<StockList>("SELECT a.* FROM akshare.stock_list a left join akshare.stock_code_temp b on a.code = b.code where b.rows is null");
+            return results;
         }
 
         #region UpdateDataByTableName 辅助方法

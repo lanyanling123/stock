@@ -74,23 +74,7 @@ const ZiXuan: React.FC = () => {
 			try {
 				const isTradetime = await getIsTradeDay();
 				isTradeDayRef.current = isTradetime.data;
-				// 最新交易日
-				newestTradeDateRef.current = parseInt((await getLatestDate(105)).data);
-				// 最近5个交易日
-				const tradeDate = await getTradeDate({ days: 5 });
-				tradeDateRef.current = tradeDate.data;
-
-				if (tradeDateRef.current && tradeDateRef.current.length > 0) {
-					const newDateRange = [
-						dayjs(formatYYYYMMDDToStr(tradeDateRef.current[3].T_date), dateFormat),
-						dayjs(formatYYYYMMDDToStr(tradeDateRef.current[0].T_date), dateFormat)
-					];
-					setDateRange(newDateRange);
-					// 添加：更新表单值
-					filterForm.setFieldsValue({
-						t_date: newDateRange
-					});
-				}
+				initTradeDate();
 				getMainSubjectOptions();
 			} catch (error) {
 				console.error('获取数据失败:', error);
@@ -117,6 +101,26 @@ const ZiXuan: React.FC = () => {
 			}
 		};
 	}, [selectedSubjectIdRef.current]);
+	// 初始化交易日期
+	const initTradeDate = async () => {
+		// 最新交易日
+				newestTradeDateRef.current = parseInt((await getLatestDate(105)).data);
+				// 最近5个交易日
+				const tradeDate = await getTradeDate({ days: 5 });
+				tradeDateRef.current = tradeDate.data;
+
+				if (tradeDateRef.current && tradeDateRef.current.length > 0) {
+					const newDateRange = [
+						dayjs(formatYYYYMMDDToStr(tradeDateRef.current[3].T_date), dateFormat),
+						dayjs(formatYYYYMMDDToStr(tradeDateRef.current[0].T_date), dateFormat)
+					];
+					setDateRange(newDateRange);
+					// 添加：更新表单值
+					filterForm.setFieldsValue({
+						t_date: newDateRange
+					});
+				}
+	};
 	// 获取股票实时价格
 	const fetchRealtimeStockData = async () => {
 		if (realtimeDataRef.current.length === 0) {
@@ -134,7 +138,7 @@ const ZiXuan: React.FC = () => {
 					{avgPriceChangePercent}%
 				</span>
 			);
-			const subjectName = searchParmasRef.current == null ? '辨识度' : mainSubjectOptions.find((item: any) => item.value == searchParmasRef.current.subject_id).label;
+			const subjectName = searchParmasRef.current == null ? '辨识度' : mainSubjectOptions.find((item: any) => item.value == searchParmasRef.current.subject_id)?.label || '';
 			setSubjectName(subjectName);
 			// 更新标题
 			setTableTitle(
@@ -175,7 +179,6 @@ const ZiXuan: React.FC = () => {
 				transformedData.forEach((item: any, index: number) => {
 					item.key = index;
 				});
-				console.log(transformedData);
 				setStockData(transformedData);
 			}
 
@@ -277,7 +280,7 @@ const ZiXuan: React.FC = () => {
 	// 获取主流题材
 	const getMainSubjectOptions = async () => {
 		try {
-			const response = await getCommonData(100, { deleted: 0, tags: '主流题材,大分支' });
+			const response = await getCommonData(111, { deleted: 0, tags: '主流题材,大分支' });
 			const placementOptions = [{ label: '辨识度', value: 100 }, ...response.data.map((item: any) => ({
 				value: item.subject_id,
 				label: item.name,
@@ -464,6 +467,7 @@ const ZiXuan: React.FC = () => {
 			const response = await importSelfStock(params);
 			if (response.success) {
 				message.success('导入成功');
+				await initTradeDate();
 				handleQueryZX(searchParmasRef.current);
 			}
 			// 关闭对话框
@@ -527,6 +531,7 @@ const ZiXuan: React.FC = () => {
 				// console.log('转换后的数据:');
 				setStockData(transformedData);
 				selectedSubjectIdRef.current = values.subject_id;
+				fetchRealtimeStockData();
 			} else {
 				message.error('查询失败');
 				realtimeDataRef.current = [];
@@ -888,6 +893,10 @@ const ZiXuan: React.FC = () => {
 									label: '容量',
 								},
 								{
+									value: '弹性',
+									label: '弹性',
+								},
+								{
 									value: '10日涨幅',
 									label: '10日涨幅',
 								},
@@ -936,7 +945,7 @@ const ZiXuan: React.FC = () => {
 
 			<LightFilter
 				initialValues={{
-					subject_id: 'bsd',
+					subject_id: 100,
 					t_date: dateRange
 				}}
 				form={filterForm}

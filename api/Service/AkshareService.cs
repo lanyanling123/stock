@@ -97,5 +97,15 @@ namespace StockAPI.Service
 
             return rows;
         }
+
+        public async Task<string> FetchJsonDataFromAkshareApi(string functionName, Dictionary<string, string> parameters)
+        {
+            var baseUrl = _configuration.GetValue<string>("AkshareApi");
+            var queryString = string.Join("&", parameters.Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value)}"));
+            baseUrl = $"{baseUrl}/api/public/{functionName}?{queryString}";
+            using var httpClient = new HttpClient();
+            var json = await httpClient.GetStringAsync(baseUrl);
+            return json;
+        }
     }
 }

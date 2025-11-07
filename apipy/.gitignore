@@ -38,7 +38,7 @@ logs/
 # Database
 *.db
 *.sqlite3
-
+config.py
 # IDE
 .vscode/
 .idea/

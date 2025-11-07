@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # 数据库配置
-    DATABASE_URL: str = "postgresql://stock:stock@47.106.158.63:5002/stock"
+    DATABASE_URL: str = "postgresql://xxx:xxx@xxxxxx:xxxx/xxx"
     
     # akshare配置
     AKSHARE_BASE_URL: str = "https://akshare.akfamily.xyz/"
